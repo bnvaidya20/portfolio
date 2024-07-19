@@ -1,0 +1,119 @@
+
+/* The navigation menu */
+.navbar {
+    overflow: hidden;
+    background-color: #2f0c62;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+  }
+
+
+  /* Navigation links */
+  .navbar a {
+    float: left;
+    font-size: 16px;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+  }
+  
+  /* The subnavigation menu */
+  .subnav {
+    float: left;
+    overflow: hidden;
+  }
+  
+  /* Subnav button */
+  .subnav .subnavbtn {
+    font-size: 16px;
+    border: none;
+    outline: none;
+    color: white;
+    padding: 14px 16px;
+    background-color: inherit;
+    font-family: inherit;
+    margin: 0;
+    height: 55px;  /* Ensure the button has the same height as the navbar */
+    line-height: 20px;  /* Center text vertically */
+    border-radius: 0;  /* Remove rounded edges */
+  }
+  
+  .subnav .subnavbtn i {
+    margin-left: 8px;  /* Add space between text and icon */
+}
+  /* Add a light blue background color to navigation links on hover */
+  .navbar a:hover, .subnav:hover .subnavbtn {
+    background-color: #1e69cb;
+  }
+  
+  /* Style the subnav content - positioned absolute */
+  .subnav-content {
+    display: none;
+    position: absolute;
+    left: 0;
+    background-color: #1e69cb;
+    width: 100%;
+    z-index: 1;
+  }
+  
+  /* Style the subnav links */
+  .subnav-content a {
+    float: left;
+    color: white;
+    text-decoration: none;
+  }
+  
+  /* Add a grey background color on hover */
+  .subnav-content a:hover {
+    background-color: #eee;
+    color: black;
+  }
+  
+  /* When you move the mouse over the subnav container, open the subnav content */
+  .subnav:hover .subnav-content {
+    display: block;
+  }
+
+
+  .navbar .icon {
+    display: none;
+}
+
+  
+/* Media query for screens smaller than 600px */
+@media screen and (max-width: 600px) {
+  .navbar a:not(:first-child), .subnav .subnavbtn {
+      display: none;
+  }
+  .navbar a.icon {
+      float: right;
+      display: block;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .navbar.responsive {
+      position: relative;
+  }
+  .navbar.responsive .icon {
+      position: absolute;
+      right: 0;
+      top: 0;
+  }
+  .navbar.responsive a, .navbar.responsive .subnav .subnavbtn {
+      float: none;
+      display: block;
+      text-align: left;
+      clear: both;
+  }
+  .navbar.responsive .subnav-content {
+      position: relative;
+  }
+  .navbar.responsive .subnav .subnavbtn {
+      display: block;
+      width: 100%;
+      text-align: left;
+  }
+}
