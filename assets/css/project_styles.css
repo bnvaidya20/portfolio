@@ -4,6 +4,9 @@
 
 .filters {
     margin: 40px 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px; /* Adjust the gap between buttons as needed */
 }
 
 #main .filter-btn {
@@ -32,6 +35,9 @@
   user-select: none;
   -webkit-user-select: none;
   touch-action: manipulation;
+  width: 200px; /* Adjust the width as needed */
+  white-space: normal; /* Allow text to wrap */
+  word-wrap: break-word; /* Ensure wrapping of long words */
 }
 
 #main .filter-btn:hover,
