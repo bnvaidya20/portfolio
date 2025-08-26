@@ -1,0 +1,196 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>AI‑Driven EV Charging Management System</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="stylesheet" href="assets/css/main.css" />
+    <link rel="stylesheet" href="assets/css/styles.css" />
+    <link rel="stylesheet" href="assets/css/nav.css" />
+    <noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+</head>
+<body class="is-preload">
+    <!-- Navigation Menu -->
+    <div class="navbar" id="navbar">
+        <a href="javascript:void(0);" class="icon" onclick="toggleMenu()">&#9776;</a>
+        <a href="index.html">Home</a>
+        <a href="aboutme.html">About</a>
+        <a href="profexperience.html">Experience</a>
+        <a href="portfolio.html">Portfolio</a>
+        <a href="researchactivity.html">Research Activities</a>
+        <a href="#contact">Contact</a>
+    </div>
+
+    <!-- Wrapper -->
+    <div id="wrapper">
+        <!-- Header -->
+        <header id="header">
+            <h1>AI‑Driven EV Charging Management System</h1>
+            <p>A concise, implementation‑ready description spanning backend, frontend, emulator hardware, autonomous demo, and wireless static charging emulation.</p>
+        </header>
+
+        <!-- Main Content -->
+        <div id="main">
+            <section class="main">
+                <header class="major">
+                    <h2>Introduction</h2>
+                </header>
+                <p>
+                The rapid adoption of electric vehicles (EVs) has created new challenges in managing charging infrastructure efficiently and sustainably. Traditional charging management systems often rely on static scheduling, limited user interaction, and manual oversight. To address these gaps, the AI-driven EV Charging Management System (EV-CMS) was designed and implemented. 
+                </p>
+
+                <p>
+                It fuses predictive analytics, optimization, and IoT‑enabled emulation to orchestrate reservations, pricing, and charger control with measurable gains in utilization, waiting time, and operating cost.
+                </p>
+
+                <p>
+                This system comprises three major components:  
+                </p>
+
+                <ol>
+                    <li>Backend Infrastructure – Application and database servers responsible for reservations, scheduling, and optimization.</li>
+                    <li>Frontend Applications – Web and mobile apps that provide user-friendly interfaces for reservations, monitoring, and billing.</li>
+                    <li>Hardware Emulation Layer – Raspberry Pi-based EV Charging Station (EVCS) emulator, Jetson Nano for self-driving vehicle navigation, and static wireless charging emulation.</li>
+                </ol>
+
+                <header class="major">
+                    <h2>Core Features</h2>
+                </header>
+                    <h3 id="slot-based-reservations"><strong>Slot‑Based Reservations</strong></h3>
+                        <ul>
+                            <li>Supports a minimum of 15-minute slots for Level 3 (DC fast charging) and 30-minute slots for Level 2 (AC charging); in both cases, multiple slots can be reserved.</li>
+                            <li>Users can reserve charging sessions in advance through the app.</li>
+                            <li>Enforces alignment to slot boundaries, configurable grace periods, and no‑show handling.</li>
+                            <li>App‑initiated start/stop, real‑time status, and digital receipts.</li>
+                        </ul>
+
+                    <h3 id="ai-optimization"><strong>AI‑Powered Optimization</strong></h3>
+                        <ul>
+                            <li><strong>Demand Forecasting:</strong> Uses time-series models and machine learning (XGBoost, LSTM) to predict charger demand.</li>
+                            <li><strong>Scheduling:</strong> Applies mixed-integer programming (MIP/CP-SAT) to assign slots fairly and minimize waiting times.</li>
+                            <li><strong>Dynamic Pricing:</strong> Reinforcement learning adjusts tariffs based on demand, occupancy, and grid constraints.</li>
+                            <li><strong>Anomaly &amp; Faults:</strong> Monitors charger telemetry for faults, abnormal energy consumption, and cyber anomalies.</li>
+                        </ul>
+
+                    <h3 id="hardware-integration"><strong>Hardware Integration</strong></h3>
+                        <ul>
+                            <li><strong>Raspberry Pi EVCS Emulator:</strong> Simulates charger behavior using OCPP-like communication, generating telemetry for real-world validation.</li>
+                            <li><strong>Self‑Driving Demo:</strong> A scaled vehicle equipped with Jetson Nano, camera, ultrasonic sensors, and modified Donkey Car software autonomously navigates to its reserved charging bay.</li>
+                            <li><strong>Wireless Static Charging Emulation:</strong> Models charging efficiency based on pad alignment and vehicle positioning, demonstrating futuristic wireless charging concepts.</li>
+                        </ul>
+
+                <header class="major">
+                    <h2>System Architecture</h2>
+                </header>
+                    <h3>Backend</h3>
+                    <ul>
+                        <li><strong>API Gateway:</strong> REST/gRPC for apps and devices; JWT for apps, optional mTLS for devices.</li>
+                        <li><strong>Scheduling Engine:</strong> Rolling‑horizon optimizer with greedy warm‑start.</li>
+                        <li><strong>Data Layer:</strong> PostgreSQL + TimescaleDB for sessions &amp; telemetry; Redis cache; object store for artifacts.</li>
+                        <li><strong>AI Services:</strong> Forecasting, dynamic pricing, anomaly detection, and fault prediction.</li>
+                    </ul>
+                    <h3>Frontend</h3>
+                    <ul>
+                        <li><strong>Web App:</strong> Booking, status, and administration (React).</li>
+                        <li><strong>Mobile App:</strong> Reservations, alerts, navigation to bay, push notifications.</li>
+                        <li><strong>Admin Console:</strong> Site power caps, tariffs, DR events, alerts triage.</li>
+                    </ul>
+                    <h3>Hardware/Edge</h3>
+                    <ul>
+                        <li><strong>Raspberry Pi:</strong> EVCS state machine; MeterValues, StatusNotification; optional physical indicators.</li>
+                        <li><strong>Jetson Nano:</strong> Visual servoing for bay/pad alignment; ultrasonic for near‑field safety.</li>
+                        <li><strong>Sensors:</strong> Camera + ultrasonic; optional current/temperature for richer emulation.</li>
+                    </ul>
+
+
+                <header class="major">
+                    <h2>Security &amp; Reliability</h2>
+                </header>
+                <p>The system incorporates robust security and observability features:</p>
+                <ul>
+                    <li><strong>Identity &amp; Access:</strong> RBAC, per‑device identity, JWT, and optional device mTLS.</li>
+                    <li><strong>Data Protection:</strong> TLS in transit; encrypted storage for billing and telemetry.</li>
+                    <li><strong>Auditability:</strong> Immutable logs for reservations, tariff changes, and admin actions.</li>
+                    <li><strong>Observability:</strong> OpenTelemetry traces; Prometheus/Grafana dashboards; anomaly alerts.</li>
+                    <li><strong>Resilience:</strong> Greedy fallback if optimizer or forecast is unavailable; periodic retraining with drift checks.</li>
+                </ul>
+
+                <header class="major">
+                <h2>Demonstration &amp; Use Cases</h2>
+                </header>
+                <ul>
+                    <li><strong>EV Owner:</strong> A driver reserves a multiple of 30-minute Level 2 slot, navigates to the station, and monitors charging progress in the app.</li>
+                    <li><strong>Self-Driving Vehicle Demo:</strong> A Jetson-powered miniature Autonomous Electric Vehicle (AEV) automatically drives to its assigned bay, aligns with a wireless charging pad, and begins charging.</li>
+                    <li><strong>Operator Dashboard:</strong> An admin monitors live charger occupancy, demand forecasts, and anomaly alerts, while adjusting site limits during a simulated demand-response event.</li>
+                </ul>
+
+                <header class="major">
+                    <h2>Future Extensions</h2>
+                </header>
+                    <ul>
+                        <li>Vehicle-to-Grid (V2G) integration for energy export.</li>
+                        <li>ISO 15118 Plug-and-Charge support for seamless EV-charger authentication.</li>
+                        <li>Carbon-aware scheduling, integrating grid carbon intensity forecasts.</li>
+                        <li>Fleet APIs to manage corporate EV fleets with priority scheduling.</li>
+                    </ul>
+
+                <header class="major">
+                    <h2>Conclusion</h2>
+                </header>
+                <p> 
+                    The AI-driven EV Charging Management System showcases how artificial intelligence, IoT, and autonomous navigation can converge to build next-generation EV infrastructure. By combining predictive analytics, optimization, emulation, and user-centric applications, it not only improves utilization and efficiency but also demonstrates innovative capabilities such as self-driving EV charging and wireless static charging emulation.                </p>
+                <p>
+                    This platform provides a blueprint for smart cities and sustainable mobility ecosystems, bridging the gap between current charging needs and future intelligent transportation systems.                    
+                </p>
+            </section>
+        </div>
+
+        <!-- Footer -->
+        <footer id="footer">
+            <section id="contact" class="contact-section">
+                <div class="contact-column">
+                    <h2>Contact Info</h2>
+                    <dl class="alt">
+                        <dt>Institution</dt>
+                        <dd> University of Ottawa</dd>
+                        <dt>Location</dt>
+                        <dd> Ottawa, ON, Canada</dd>
+                        <dt>Phone</dt>
+                        <dd>+1 613-562-5800</dd>
+                        <dt>Email</dt>
+                        <dd><a href="mailto:bvaidya@uottawa.ca">bvaidya@uottawa.ca</a></dd>
+                    </dl>
+                    <ul class="icons">
+                        <li><a href="https://www.linkedin.com/in/bnvaidya" class="icon brands fa-linkedin-in alt" target="_blank"><span class="label">LinkedIn</span></a></li>
+                        <li><a href="https://github.com/bnvaidya20" class="icon brands fa-github alt" target="_blank"><span class="label">GitHub</span></a></li>
+                    </ul>
+                </div>
+                <div class="menu-column">
+                    <h2>Quick Menu</h2>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="aboutme.html">About Me</a></li>
+                        <li><a href="index.html#second">Technical Skills</a></li>
+                        <li><a href="profexperience.html">Experience</a></li>
+                        <li><a href="portfolio.html">Portfolio</a></li>
+                        <li><a href="researchactivity.html">Research Activities</a></li>
+                    </ul>
+                </div>
+            </section>
+            <div class="copyright">
+                &copy; Binod Vaidya. All rights reserved.
+            </div>
+        </footer>
+    </div>
+
+    <!-- Scripts -->
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/js/jquery.scrollex.min.js"></script>
+    <script src="assets/js/jquery.scrolly.min.js"></script>
+    <script src="assets/js/browser.min.js"></script>
+    <script src="assets/js/breakpoints.min.js"></script>
+    <script src="assets/js/util.js"></script>
+    <script src="assets/js/main.js"></script>
+    <script src="assets/js/togglemenu.js"></script>
+</body>
+</html>
