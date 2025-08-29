@@ -1,0 +1,230 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>Executive Summary: Autonomous EV Ride-Hailing System</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="stylesheet" href="assets/css/main.css" />
+    <link rel="stylesheet" href="assets/css/styles.css" />
+    <link rel="stylesheet" href="assets/css/nav.css" />
+    <noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+</head>
+<body class="is-preload">
+    <!-- Navigation Menu -->
+    <div class="navbar" id="navbar">
+        <a href="javascript:void(0);" class="icon" onclick="toggleMenu()">&#9776;</a>
+        <a href="index.html">Home</a>
+        <a href="aboutme.html">About</a>
+        <a href="profexperience.html">Experience</a>
+        <a href="portfolio.html">Portfolio</a>
+        <a href="researchactivity.html">Research Activities</a>
+        <a href="#contact">Contact</a>
+    </div>
+
+    <!-- Wrapper -->
+    <div id="wrapper">
+        <!-- Header -->
+        <header id="header">
+            <h1>Executive Summary: Autonomous EV Ride-Hailing System</h1>
+        </header>
+
+        <!-- Main Content -->
+        <div id="main">
+            <section class="main">
+                <header class="major">
+                    <h2>Project Overview</h2>
+                </header>
+                <p>
+                This document presents a design and implementation plan for an Autonomous Electric Vehicle (AEV) Ride-Hailing System. The primary objective is to develop a functional prototype that integrates core ride-hailing functionalities with the unique requirements of autonomous electric vehicles, covering the complete mobility-energy loop. Built on scalable, efficient, privacy-conscious cloud-native technologies, it leverages advanced algorithms for real-time fleet management. The system incorporates federated learning capabilities and seamless charging integration, delivering sustainable urban transportation. This comprehensive solution addresses next-generation mobility needs through energy-aware platform design and privacy-centric operations.                 
+                </p>
+
+                <p class="highlight"><strong>Key Differentiator:</strong> The system supports two dispatching approaches: a baseline Greedy algorithm and a more advanced, recommended Rolling-Horizon Min-Cost Flow (RH-MCF) algorithm for improved efficiency and robustness under load.<br>
+                RH-MCF algorithm outperforms traditional greedy approaches by 10-20% in efficiency metrics while maintaining real-time performance through micro-batching and warm-start optimization.</p>
+                <br>
+                
+                <header class="major">
+                    <h2>Core System Components &amp; Architecture</h2>
+                </header>
+                    <h3 id="architecture"><strong>Architecture</strong></h3>
+                        <p>The system is built using a <strong>microservices architecture</strong> for scalability and maintainability, orchestrated on Kubernetes. It comprises several key modules:</p>
+                        <ul>
+                            <li><strong>Customer Applications:</strong> Web portal and mobile app (React/React Native) for users to plan, book, and track rides.</li>
+                            <li><strong>Core Platform Services:</strong> A suite of backend microservices handling user management, trip lifecycle, AEV fleet orchestration (status, dispatch, routing, charging), reservations, payments, notifications, telemetry, and security.</li>
+                            <li><strong>Data Layer:</strong> Utilizes a hybrid approach with SQL databases (e.g., PostgreSQL) for structured data (users, trips, billing) and NoSQL (e.g., MongoDB) for high-volume telemetry and status updates. Streaming platforms (e.g., Kafka) and caches (e.g., Redis) manage real-time data flow.</li>
+                            <li><strong>Fleet Orchestration (ATMDM):</strong> The core AEV Management Module handles real-time vehicle status ingestion, information management, greedy or RH-MCF dispatch logic, maintenance/charging coordination, and route planning.</li>
+                            <li><strong>Energy Integration:</strong> Seamless integration with charging networks (e.g., via OCPP) for real-time bay availability, booking, and autonomous vehicle docking.</li>
+                            <li><strong>Privacy-Centric AI:</strong> A Federated Learning (FL) layer for training models (ETA, demand, energy, anomaly detection) directly on user/AEV devices, ensuring raw data never leaves the device.</li>
+                        </ul>
+
+                    <h3 id="features-technology"><strong>Advanced Features & Technologies</strong></h3>
+
+                    <p>The system introduces several groundbreaking capabilities and advanced features:</p>
+                    <ul>
+                        <li><strong>Rolling-Horizon Min-Cost Flow (RH-MCF) Dispatch:</strong> Recommended over the baseline greedy approach, RH-MCF batches requests and solves a global optimization problem to minimize total system cost (e.g., empty miles, wait times, energy use), leading to better fleet efficiency and rider experience, especially under high load.</li>
+                        <li><strong>Federated Learning (FL):</strong> Enables continuous improvement of key models (ETA, demand prediction) while preserving user privacy by training on-device and aggregating only model updates.</li>
+                        <li><strong>Autonomous Charging:</strong> Enables seamless automated charging capabilities.</li>
+                        <li><strong>Security & Safety:</strong> Comprehensive security measures including OIDC/JWT authentication, TLS encryption, RBAC/ABAC, field-level data encryption, and safety features like geofencing and remote E-stop.</li>
+                    </ul>
+
+                    <p>Highlighting the benefits of these features:</p>
+
+                    <table>
+                        <tr>
+                            <th>Feature</th>
+                            <th>Description</th>
+                            <th>Benefit</th>
+                        </tr>
+                        <tr>
+                            <td>RH-MCF Dispatch</td>
+                            <td>Min-cost flow optimization with micro-batching</td>
+                            <td>10-20% lower empty miles, better SLA compliance</td>
+                        </tr>
+                        <tr>
+                            <td>Federated Learning</td>
+                            <td>Privacy-preserving model training on-device</td>
+                            <td>Improved predictions without centralizing sensitive data</td>
+                        </tr>
+                        <tr>
+                            <td>Autonomous Charging</td>
+                            <td>Seamless integration with charging networks</td>
+                            <td>Reduced operational downtime, energy optimization</td>
+                        </tr>
+                        <tr>
+                            <td>Multi-factor Verification</td>
+                            <td>QR/BLE/on-device face matching for pickup</td>
+                            <td>Enhanced security while preserving privacy</td>
+                        </tr>
+                    </table>
+        
+                <header class="major">
+                    <h2>Operational Workflows</h2>
+                </header>
+                    <p>The system implements several critical workflows to ensure smooth operation:</p>
+                    <ul>
+                        <li><strong>Trip Planning vs. Booking:</strong> A two-step process where users first "plan" to get quotes without locking vehicles, followed by an atomic "book" transaction that secures a vehicle and confirms the ride details.</li>
+                        <li><strong>Real-time Dispatch:</strong> Matches riders with the most suitable idle AEV using either the Greedy or RH-MCF algorithm, considering factors like proximity, battery range, and charging needs.</li>
+                        <li><strong>Pickup Verification:</strong> Ensures rider safety and prevents fraud using a multi-factor, privacy-preserving method involving QR codes, BLE proximity, and on-device face matching.</li>
+                        <li><strong>Autonomous Charging:</strong> After drop-off, the system directs the AEV to the nearest suitable charger, manages queueing, and initiates the docking procedure automatically.</li>
+                    </ul>
+
+                <header class="major">
+                    <h2>Development &amp; Deployment Plan</h2>
+                </header>
+                <p>The project is planned for a 12-16 week development cycle, divided into five phases:</p>
+
+                <div class="phase-timeline">
+                    <div class="phase">Phase 0<br>Foundations<br>(Weeks 1-2)</div>
+                    <div class="phase">Phase 1<br>Core Trips & AEV<br>(Weeks 3-6)</div>
+                    <div class="phase">Phase 2<br>Charging & Reservations<br>(Weeks 7-9)</div>
+                    <div class="phase">Phase 3<br>Verification & Payments<br>(Weeks 10-12)</div>
+                    <div class="phase">Phase 4<br>FL & Analytics<br>(Weeks 13-16)</div>
+                </div>
+
+                <ol>
+                    <li><strong>Foundations:</strong> Setup environments, CI/CD, and core infrastructure.</li>
+                    <li><strong>Core Trips & AEV:</strong> Implement plan/book flows, basic ATMDM functionality, and live tracking.</li>
+                    <li><strong>Charging & Reservations:</strong> Integrate charging network APIs and implement reservation logic.</li>
+                    <li><strong>Pickup Verification & Payments:</strong> Complete rider verification workflow and payment processing.</li>
+                    <li><strong>FL & Analytics:</strong> Deploy the initial FL orchestrator and analytics dashboards.</li>
+                </ol>
+                <p class="spacer">Each phase delivers working APIs, test suites, and operational documentation.</p>
+
+                <header class="major">
+                <h2>Expected Outcomes &amp; KPIs</h2>
+                </header>
+                    <p>The system aims to deliver a superior ride-hailing experience with key performance indicators focused on:</p>
+                    <ul>
+                        <li><strong>Rider Experience:</strong> Fast match times, accurate ETAs, low cancellation rates, high NPS.</li>
+                        <li><strong>Fleet Efficiency:</strong> High vehicle utilization, low empty miles, optimized charging queue times, minimal SoC violations.</li>
+                        <li><strong>System Reliability:</strong> High API success rates, low latency, stable real-time communication.</li>
+                        <li><strong>Privacy & Trust:</strong> High FL participation, adherence to differential privacy budgets, secure pickup verification.</li>
+                    </ul>
+                    
+                    <h3 id="features-technology"><strong>Highlighted KPIs</strong></h3>
+                        <div class="kpi-grid">
+                            <div class="kpi-item">RH-MCF is expected to reduce empty miles by 10-20%</div>
+                            <div class="kpi-item">Average pickup ETA by 8-15% at moderate load</div>
+                            <div class="kpi-item">Significantly decrease SLA breaches (by 20-30%)</div>
+                            <div class="kpi-item">Charging queue penalties (by 10-25%) under high load</div>
+                        </div>
+                    <br>
+
+                <header class="major">
+                    <h2>Competitive Advantages</h2>
+                </header>
+                    <ul>
+                        <li><strong>Energy Integration:</strong> Full mobility-energy loop with autonomous charging</li>
+                        <li><strong>Privacy-Centric AI:</strong> Federated learning enables improvement without data centralization</li>
+                        <li><strong>Production-Ready Architecture:</strong> Microservices, containerization, and CI/CD pipeline</li>
+                        <li><strong>Scalable Dispatch:</strong> RH-MCF algorithm efficiently handles city-scale operations</li>
+                        <li><strong>Compliance Built-in:</strong> Security, privacy, and safety considerations integrated throughout</li>
+                    </ul>
+
+                <header class="major">
+                    <h2>Strategic Importance</h2>
+                </header>
+                    <p>This system positions the organization at the forefront of autonomous mobility with a solution that balances operational efficiency, user experience, and sustainability. The platform's modular design allows for future expansion into multi-rider pooling, V2G integration, and city-scale simulation capabilities.</p>
+    
+                    <div class="highlight">
+                        <strong>Recommendation:</strong> Implement the RH-MCF dispatch system as the highest-leverage improvement over traditional greedy approaches, delivering immediate efficiency gains while maintaining compatibility with existing infrastructure.
+                    </div>
+                    <br>
+                                    
+                <header class="major">
+                    <h2>Future Extensions</h2>
+                </header>
+
+                    <p>Beyond the initial MVP, the system is designed to accommodate advanced features such as multi-rider pooling, auction-based dispatch, dynamic vehicle repositioning, energy-aware pricing, V2G participation, and integration with verifiable credentials for enhanced security and privacy.</p>
+
+            </section>
+        </div>
+
+        <!-- Footer -->
+        <footer id="footer">
+            <section id="contact" class="contact-section">
+                <div class="contact-column">
+                    <h2>Contact Info</h2>
+                    <dl class="alt">
+                        <dt>Institution</dt>
+                        <dd> University of Ottawa</dd>
+                        <dt>Location</dt>
+                        <dd> Ottawa, ON, Canada</dd>
+                        <dt>Phone</dt>
+                        <dd>+1 613-562-5800</dd>
+                        <dt>Email</dt>
+                        <dd><a href="mailto:bvaidya@uottawa.ca">bvaidya@uottawa.ca</a></dd>
+                    </dl>
+                    <ul class="icons">
+                        <li><a href="https://www.linkedin.com/in/bnvaidya" class="icon brands fa-linkedin-in alt" target="_blank"><span class="label">LinkedIn</span></a></li>
+                        <li><a href="https://github.com/bnvaidya20" class="icon brands fa-github alt" target="_blank"><span class="label">GitHub</span></a></li>
+                    </ul>
+                </div>
+                <div class="menu-column">
+                    <h2>Quick Menu</h2>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="aboutme.html">About Me</a></li>
+                        <li><a href="index.html#second">Technical Skills</a></li>
+                        <li><a href="profexperience.html">Experience</a></li>
+                        <li><a href="portfolio.html">Portfolio</a></li>
+                        <li><a href="researchactivity.html">Research Activities</a></li>
+                    </ul>
+                </div>
+            </section>
+            <div class="copyright">
+                &copy; Binod Vaidya. All rights reserved.
+            </div>
+        </footer>
+    </div>
+
+    <!-- Scripts -->
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/js/jquery.scrollex.min.js"></script>
+    <script src="assets/js/jquery.scrolly.min.js"></script>
+    <script src="assets/js/browser.min.js"></script>
+    <script src="assets/js/breakpoints.min.js"></script>
+    <script src="assets/js/util.js"></script>
+    <script src="assets/js/main.js"></script>
+    <script src="assets/js/togglemenu.js"></script>
+</body>
+</html>

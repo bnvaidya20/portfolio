@@ -27,6 +27,44 @@ section h2 {
     margin-bottom: 20px;
 }
 
+/* Specific Components */
+
+.highlight { 
+	background-color: 
+	#EBF5FB; padding: 20px; 
+	border-left: 4px solid #2E86C1; 
+}
+
+.phase-timeline {
+  display: flex;
+  justify-content: space-between;
+  margin: 20px 0;
+}
+.phase {
+  flex: 1;
+  text-align: center;
+  padding: 10px;
+  background: #e8f4fc;
+  margin: 0 5px;
+  border-radius: 5px;
+}
+
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin: 15px 0;
+}
+.kpi-item {
+  background: #e8f4fc;
+  padding: 10px;
+  border-radius: 5px;
+}
+		
+.spacer {
+  margin-bottom: 20px;
+}
+
 
 /* Footer section */
 #footer {

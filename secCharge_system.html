@@ -1,0 +1,247 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>SecCharge System</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="stylesheet" href="assets/css/main.css" />
+    <link rel="stylesheet" href="assets/css/styles.css" />
+    <link rel="stylesheet" href="assets/css/nav.css" />
+    <noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+</head>
+<body class="is-preload">
+    <!-- Navigation Menu -->
+    <div class="navbar" id="navbar">
+        <a href="javascript:void(0);" class="icon" onclick="toggleMenu()">&#9776;</a>
+        <a href="index.html">Home</a>
+        <a href="aboutme.html">About</a>
+        <a href="profexperience.html">Experience</a>
+        <a href="portfolio.html">Portfolio</a>
+        <a href="researchactivity.html">Research Activities</a>
+        <a href="#contact">Contact</a>
+    </div>
+
+    <!-- Wrapper -->
+    <div id="wrapper">
+        <!-- Header -->
+        <header id="header">
+            <h1>SecCharge System</h1>
+        </header>
+
+        <!-- Main Content -->
+        <div id="main">
+            <section class="main">
+                <header class="major">
+                    <h2>Project Overview</h2>
+                </header>
+
+                <p>
+                <strong>SecCharge: Secure Electric Vehicle Ecosystem for Smart Grid</strong> is a secure, multi‑tier electric‑mobility platform that enables end‑to‑end EV charging services—from user onboarding and reservations to authorization, charging session orchestration, metering, billing, and third‑party settlement. 
+                <br> The platform evolved through several iterations (2014–2017), with <strong>the Improved SecCharge System (2017)</strong> strengthening the architecture around a Spring‑based Application Server, JWT‑secured APIs, Angular single‑page web client, Android mobile clients (including an embedded AEV client), and a Control Center (CC) implementing Open Charge Point Protocol (OCPP) for wired and wireless charging stations (CS/WCS). A dedicated Authentication Server validates EV credentials (contract certificates), and a database persists operational and billing data. 
+                The improved version also clarifies domain entities (Network Provider, Charging Station Site, Charging Station/ports, charger/connector types) and maps them to operational policies (business hours, electricity prices, reservation slots).
+                </p>
+                
+                <p class="spacer">This document synthesizes the complete SecCharge specification—<strong>System Architecture, System Implementation, Use Cases, and User Requirements</strong>—and emphasizes the <strong>2017 Improved SecCharge</strong> where it supersedes earlier design choices. We preserve the 2014–2016 content for historical completeness and traceability, especially around ISO/IEC 15118 V2G PKI‑based authorization and detailed OCPP transaction flows.</p>
+
+                <header class="major">
+                    <h2>System Architecture</h2>
+                </header>
+                    <h3 id="highlevel-topology"><strong>High‑Level Topology (2017)</strong></h3>
+                        <p>The Improved SecCharge architecture organizes the platform into the following components, interacting primarily via REST over HTTP(S):</p>
+                        
+                        <ul>
+                            <li><strong>Web App (Angular SPA):</strong> Single‑page application for participating users (search, reservation, charging control, trip planning) and service‑provider functions (manage sites/stations). End‑to‑end testing leverages Protractor.</li>
+                            <li><strong>Android Mobile App:</strong> Parity with the web app for participating users.</li>
+                            <li><strong>AEV Android App:</strong> Embedded in the vehicle (on a Raspberry Pi for demo). Monitors the vehicle State‑of‑Charge (SoC) and proactively reserves a station when the SoC drops below a critical threshold; not distributed to end users.</li>
+                            <li><strong>Application Server (Spring Boot):</strong> The transactional heart of SecCharge. Exposes REST APIs to clients and backend services. Responsible for all database CRUD, enforces endpoint security, and applies <strong>JWT‑based stateless authentication/authorization</strong>. Cross‑origin access is handled via CORS policies; REST API documentation is auto‑generated via Swagger.</li>
+                            <li><strong>Authentication Server (EV Only):</strong> Validates EV contract certificates sent by CS via CC and App Server; only authenticated EVs can start charging.</li>
+                            <li><strong>Control Center (CC):</strong> Manages protocol exchanges with <strong>Charging Stations (CS) and Wireless Charging Stations (WCS)</strong> using <strong>OCPP</strong>; forwards telemetry such as SoC and executes remote start/stop transactions.</li>
+                            <li><strong>CS/WCS (Raspberry Pi):</strong> Field gateways executing port control, local authorization, and periodic telemetry. On EV connection, the station sends the EV authentication certificate (for EVs) and SoC readings.</li>
+                            <li><strong>Database Server:</strong> Durable storage for users, assets (provider/site/station/ports), reservations, prices, and session/transaction/billing artifacts.</li>
+                        </ul>
+                        
+                        <p class="highlight">Compared to the legacy layout, the 2017 revision formalizes the provider→site→station→port hierarchy and attaches <strong>business hours</strong> and <strong>electricity prices</strong> to each site; charger energy levels (LEVEL1, LEVEL2, DCFAST, and WIRELESS) and connector types are modeled explicitly, enabling richer search and reservation flows.</p>
+                    
+                    <br>
+                    <h3 id="security-model"><strong>Security Model</strong></h3>
+
+                        <p>SecCharge's defense‑in‑depth is layered as follows:</p>
+                        
+                        <ul>
+                            <li><strong>Transport Security:</strong> HTTP(S) for client–server; HTTPS with SSL/TLS for third‑party payment integrations.</li>
+                            <li><strong>API Security:</strong> <strong>Spring Security</strong> guards endpoints; per‑endpoint authorization via ant‑matchers; <strong>JWT</strong> (JSON Web Token) conveys authenticated identity, roles, and claims for stateless, horizontally scalable sessions.</li>
+                            <li><strong>Error Handling:</strong> Centralized <code>@RestControllerAdvice</code>‑based exception handling provides consistent client feedback; <code>ResponseStatusException</code> accelerates prototyping of typed API errors.</li>
+                            <li><strong>Credential Hygiene:</strong> <strong>BCrypt</strong> (adaptive, slow hashing) hardens password storage against brute‑force attacks; parameterized strength settings align with policy and hardware capabilities.</li>
+                            <li><strong>Identity & Certificates (EV):</strong> For EV‑side identification, SecCharge adopts ISO/IEC 15118's V2G PKI model: EVs receive contract certificates from an issuing CA (under a global V2G Root/Regional Sub‑CA trust chain). Contract certificates support <strong>Plug‑and‑Charge</strong> identification; <strong>External Identification Means (EIM)</strong> is also supported for non‑PnC flows. SecCharge's Authentication Server validates certificates and binds EV↔user for charging authorization.</li>
+                        </ul>
+
+                    <h3 id="legacy-architecture"><strong>Legacy Architectural Baseline (2015)</strong></h3>
+
+                        <p class="spacer">The earlier architecture established core tiers (Java 7, Spring MVC, Tomcat 7, Oracle 11g) and communication patterns (REST/HTTPS between clients and the server; SQL over TCP/IP to the database; OCPP between CC and stations; TCP/Web APIs to payment providers). It modeled integration with home charging, the Control Server, and payment/authorization flows—providing the foundation refined in the 2017 improved variant.</p>
+        
+                <header class="major">
+                    <h2>System Implementation</h2>
+
+                        <h3 id="app-server"><strong>Application Server (Spring Boot)</strong></h3>
+
+                            <ul>
+                                <li><strong>CORS Policies:</strong> Configured to permit approved origins for web/mobile front ends; preflight and method restrictions are enforced.</li>
+                                <li><strong>Swagger/OpenAPI:</strong> Auto‑documents REST endpoints; developers browse <code>.../swagger-ui.html</code> to explore and test.</li>
+                                <li><strong>Endpoint Security:</strong> Custom <code>HttpSecurity</code> config secures sensitive routes; anonymous/public endpoints (e.g., login) are whitelisted; all other routes require authentication.</li>
+                                <li><strong>JWT Auth Flow:</strong> (1) Client posts credentials; (2) Server validates, issues a signed JWT with user profile and roles; (3) Client includes bearer token in <code>Authorization</code> header for subsequent calls; (4) Token expiry prompts refresh/login; (5) Server remains stateless.</li>
+                                <li><strong>Global Error Handling:</strong> Central <code>GlobalExceptionHandler</code> handles validation/constraint violations; other exceptions mapped with <code>ResponseStatusException</code> when appropriate.</li>
+                                <li><strong>Password Storage:</strong> <code>BCryptPasswordEncoder</code> with policy‑aligned strength; migration hooks for future algorithms.</li>
+                                <li><strong>Reservation APIs:</strong> Search CSSs within a radius with optional filters (charger/connectors); return site metadata (business hours, provider, price vectors) and proceed to slot selection (multi‑slot reservations).</li>
+                            </ul>
+
+                        <h3 id="cc-station"><strong>Control Center (OCPP) and Station Integration</strong></h3>
+                            <ul>
+                                <li><strong>OCPP Operations</strong> implemented/benchmarked against Syntronic charging stations include <strong>Authorize</strong>, <strong>StartTransaction</strong>, <strong>StopTransaction</strong>, <strong>MeterValues</strong>, <strong>Heartbeat</strong>, and <strong>BootNotification</strong>.</li>
+                                <li>The 2016 work itemized each operation's required fields, expected OCPP behavior, and current implementation gaps. Where physical meters were unavailable, the system computed session energy from start/stop timestamps as an interim measure.</li>
+                                <li>The CC mediates between the App Server and EVSE, forwarding remote start/stop and returning status/telemetry to the application tier.</li>
+                            </ul>
+
+                        <h3 id="trip-planning"><strong>Trip/Route Planning</strong></h3>
+                            <ul>
+                                <li>Trip planning combines Google Directions alternatives with SoC‑aware <strong>critical points</strong> detection. For each route, the system identifies locations ~25 km <strong>before</strong> each critical point and finds CSs within a 10 km radius.</li>
+                                <li>Users refine the candidates by charger attributes, prices, and availability to choose a feasible, cost‑aware path.</li>
+                            </ul>                            
+
+                        <h3 id="3party-payment"><strong>Third‑Party Payment</strong></h3>
+                            <ul>
+                                <li>A reference integration demonstrates secure, account‑linked third‑party billing via an HTTPS client to a partner REST API. </li>
+                                <li>Features include user verification, account CRUD, periodic usage export, and synchronized address/account updates.</li>
+                                <li>Failure modes (invalid details, partner service outage) return clear UI states; successful verification transitions inputs to read‑only prior to submission.</li>
+                            </ul>    
+                            
+
+                <header class="major">
+                    <h2>Representative Use Cases</h2>
+                </header>
+
+                        <h3 id="mobile-web"><strong>Mobile &amp; Web</strong></h3>
+                            <ul>
+                                <li><strong>UC‑1.1 Login:</strong> Role‑based entry point with lockout after repeated failures; successful authentication lands the user on a personalized dashboard.</li>
+                                <li><strong>UC‑1.2 Find a Charging Station:</strong> Triggered by low SoC or by user intent; supports basic and advanced search (charger/connector types), reservation and trip planning handoffs.</li>
+                                <li><strong>Start/Cancel Charging:</strong> After reservation and pre‑authorization, the user confirms <strong>Start</strong>; CC unlocks the port and SoC telemetry renders as a live graph. <strong>Cancel</strong> frees the port and clears pre‑authorization.</li>
+                                <li><strong>Trip Planning:</strong> Enter origin/destination, review recommended routes with critical‑point clusters and nearby candidate stations; refine by price and attributes; inject chosen CSs into the route.</li>
+                                <li><strong>Manage Payments:</strong> Add/edit/delete third‑party accounts; verify via partner API; view billing history and invoices.</li>
+                            </ul> 
+
+                        <h3 id="admin"><strong>Administrative</strong></h3>
+                            <ul>
+                                <li><strong>SecCharge Administrator (SA):</strong> Add/modify/delete user accounts; reset passwords; audit actions.</li>
+                                <li><strong>Charging Station Administrator (CSA):</strong> Commission/decommission stations; update site/station metadata (address, power, price, comms capabilities).</li>
+                            </ul>
+
+                        <h3 id="ev-automation"><strong>EV/AEV Automations</strong></h3>
+                            <ul>
+                                <li><strong>AEV SoC‑Driven Reservation:</strong> Embedded client monitors SoC and auto‑reserves when below threshold.</li>
+                                <li><strong>EV Plug‑and‑Charge:</strong> EV presents contract certificate; station/CC/App/Authentication Server coordinate certificate validation; on success, EV is authorized to start charging.</li>
+                            </ul>
+
+                <header class="major">
+                <h2>User Requirements (Selected Highlights)</h2>
+                </header>
+                   
+                    <h3 id="module1"><strong>Module 1 – User Account &amp; Preferences</strong></h3>
+                        <ul>
+                            <li>Login with username/password; lockout after failed attempts; password reset via email.</li>
+                            <li>Mobile‑compatible UI with standard controls; modify preferences and schedules.</li>
+                            <li>Display SoC and optimal charging strategy; notify when charging completes with estimated cost; show plugged‑in SoC in real time.</li>
+                            <li>Access electricity prices at any time.</li>
+                        </ul>
+
+                    <h3 id="module2"><strong>Module 2 – Payments &amp; Billing</strong></h3>
+                        <ul>
+                            <li>Choose payment mode; email receipts; store and retrieve transaction history.</li>
+                            <li>Support third‑party billing; authenticate user before charging and require explicit start confirmation.</li>
+                            <li>Allow refund requests; display reservation policies and penalties.</li>
+                        </ul>
+
+                    <h3 id="module3"><strong>Module 3 – V2H/B (Home/Building)</strong></h3>
+                        <ul>
+                            <li>Select charge vs discharge; set maximum SoC thresholds; compute ahead‑of‑time price information; recommend schedules based on SoC, departure time, and price.</li>
+                        </ul>
+
+                    <h3 id="module4"><strong>Module 4 – Trip/Route Planning</strong></h3>
+                        <ul>
+                            <li>Map of CSs with types (L2/DC Fast/Wireless) and current user location with prices.</li>
+                            <li>Select routes and available CSs; add CSs to route; full mobile access to functionality.</li>
+                            <li>Choose payment/billing options (including third‑party); reserve/cancel in advance; save invoices locally.</li>
+                            <li>Configuration: CSAs can commission/decommission stations, edit attributes, and open accounts with SecCharge; SA can modify any user account.</li>
+                        </ul>
+
+                <header class="major">
+                    <h2>Gaps, Risks, and Roadmap</h2>
+                </header>
+                    <ul>
+                        <li><strong>Reservation Completeness:</strong> Implement APIs to fetch already‑booked slots, query site‑supported charger types, and persist reservations (noted for future work in the improved system).</li>
+                        <li><strong>OCPP Parity:</strong> Replace file‑based interim authorization flow with standards‑conformant message exchange; add physical metering for <strong>MeterValues</strong> and complete <strong>Heartbeat</strong>/<strong>BootNotification</strong> semantics.</li>
+                        <li><strong>PnC at Scale:</strong> Stand up dedicated V2G Root/Sub‑CA integrations or leverage compliant PKI providers; automate certificate lifecycle (provisioning, rotation, revocation).</li>
+                        <li><strong>Security Hardening:</strong> JWT rotation/refresh, token binding for mobile, stricter CORS in production; expand exception mapping; formalize password policy (BCrypt work factor review).</li>
+                        <li><strong>Operational Observability:</strong> Structured audit logs for admin actions; API metrics; CC telemetry dashboards; alerting on partner‑API failures.</li>
+                        <li><strong>Data Model Enhancements:</strong> Normalize provider→site→station→port models across APIs; enrich price catalogs (time‑of‑use, demand charges); introduce slot‑level constraints.</li>
+                    </ul>
+                                    
+                <header class="major">
+                    <h2>Conclusion</h2>
+                </header>
+                    <ul>
+                        <li><strong>The Improved SecCharge System</strong> modernizes the platform with a stateless, JWT‑secured application tier, richer client experiences (Angular SPA, Android, embedded AEV), and a clearer demarcation between application services, OCPP‑mediated control, and certificate‑based EV authentication.</li>
+                        <li>Aligning OCPP flows with metered telemetry and operationalizing ISO/IEC 15118 authorization will complete the journey from research prototype to production‑grade EV charging network orchestration.</li>
+                        <li>The user and administrative requirements articulated across <strong>Modules 1–4</strong> form a concrete acceptance baseline that directly maps to implemented features and prioritized backlog items.</li>
+                    </ul>
+
+            </section>
+        </div>
+
+        <!-- Footer -->
+        <footer id="footer">
+            <section id="contact" class="contact-section">
+                <div class="contact-column">
+                    <h2>Contact Info</h2>
+                    <dl class="alt">
+                        <dt>Institution</dt>
+                        <dd> University of Ottawa</dd>
+                        <dt>Location</dt>
+                        <dd> Ottawa, ON, Canada</dd>
+                        <dt>Phone</dt>
+                        <dd>+1 613-562-5800</dd>
+                        <dt>Email</dt>
+                        <dd><a href="mailto:bvaidya@uottawa.ca">bvaidya@uottawa.ca</a></dd>
+                    </dl>
+                    <ul class="icons">
+                        <li><a href="https://www.linkedin.com/in/bnvaidya" class="icon brands fa-linkedin-in alt" target="_blank"><span class="label">LinkedIn</span></a></li>
+                        <li><a href="https://github.com/bnvaidya20" class="icon brands fa-github alt" target="_blank"><span class="label">GitHub</span></a></li>
+                    </ul>
+                </div>
+                <div class="menu-column">
+                    <h2>Quick Menu</h2>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="aboutme.html">About Me</a></li>
+                        <li><a href="index.html#second">Technical Skills</a></li>
+                        <li><a href="profexperience.html">Experience</a></li>
+                        <li><a href="portfolio.html">Portfolio</a></li>
+                        <li><a href="researchactivity.html">Research Activities</a></li>
+                    </ul>
+                </div>
+            </section>
+            <div class="copyright">
+                &copy; Binod Vaidya. All rights reserved.
+            </div>
+        </footer>
+    </div>
+
+    <!-- Scripts -->
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/js/jquery.scrollex.min.js"></script>
+    <script src="assets/js/jquery.scrolly.min.js"></script>
+    <script src="assets/js/browser.min.js"></script>
+    <script src="assets/js/breakpoints.min.js"></script>
+    <script src="assets/js/util.js"></script>
+    <script src="assets/js/main.js"></script>
+    <script src="assets/js/togglemenu.js"></script>
+</body>
+</html>
